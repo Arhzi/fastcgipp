@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
-project(fastcgi++ LANGUAGES CXX)
+project(fastcgi++ CXX)
+
+set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+
+enable_language(CXX)
 
 set(VERSION      "3.0beta")
 set(VERSION_MAJOR 3)
@@ -33,11 +37,11 @@ endif()
 # Set compile flags for gcc and clang
 if(UNIX)
     set(CMAKE_CXX_FLAGS
-        "$ENV{CXXFLAGS} -std=c++14 -Wall -Werror -Wold-style-cast -pthread")
+        "$ENV{CXXFLAGS} -std=c++1y -Wall -Werror -Wold-style-cast -pthread")
     set(CMAKE_CXX_FLAGS_RELEASE
-        "$ENV{CXXFLAGS} -O3 -fomit-frame-pointer -std=c++14 -Wall -Werror -Wold-style-cast -pthread")
+        "$ENV{CXXFLAGS} -O3 -fomit-frame-pointer -std=c++1y -Wall -Werror -Wold-style-cast -pthread")
     set(CMAKE_CXX_FLAGS_DEBUG
-        "$ENV{CXXFLAGS} -Og -fno-omit-frame-pointer -g -ggdb -std=c++14 -Wall -Werror -Wold-style-cast -pthread")
+        "$ENV{CXXFLAGS} -Og -fno-omit-frame-pointer -g -ggdb -std=c++1y -Wall -Werror -Wold-style-cast -pthread")
 endif()
 
 include_directories(

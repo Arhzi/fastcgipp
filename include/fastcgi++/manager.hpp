@@ -179,6 +179,7 @@ namespace Fastcgipp
         //! Handles low level communication with the other side
         Transceiver m_transceiver;
 
+    public:
         //! Pass a message to a request
         void push(Protocol::RequestId id, Message&& message);
 

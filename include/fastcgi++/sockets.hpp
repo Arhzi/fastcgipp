@@ -47,6 +47,11 @@
 #include <poll.h>
 #endif
 
+//! dirty hack for compilation on CenOS 6.8 & clang 3.34
+#if defined(__linux__)
+#include <unistd.h>
+#endif
+
 //! Topmost namespace for the fastcgi++ library
 namespace Fastcgipp
 {
