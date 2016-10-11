@@ -178,7 +178,8 @@ namespace Fastcgipp
 
         //! Handles low level communication with the other side
         Transceiver m_transceiver;
-
+        
+    //warning: just compile on centos 6 and clang 3.34
     public:
         //! Pass a message to a request
         void push(Protocol::RequestId id, Message&& message);
