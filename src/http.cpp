@@ -639,6 +639,7 @@ Fastcgipp::Http::SessionId::SessionId()
     m_timestamp = std::time(nullptr);
 }
 
+//fix: compile on cenos 6 and clang 3.34
 /*template Fastcgipp::Http::SessionId::SessionId<char>(
         const std::basic_string<char>& string);
 template Fastcgipp::Http::SessionId::SessionId<wchar_t>(
