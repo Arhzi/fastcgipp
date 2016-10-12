@@ -42,6 +42,7 @@
 #include <ctime>
 #include <cstring>
 #include <atomic>
+#include <sstream>
 
 #include <fastcgi++/protocol.hpp>
 
