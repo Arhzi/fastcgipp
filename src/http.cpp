@@ -640,7 +640,10 @@ Fastcgipp::Http::SessionId::SessionId()
 }
 
 //fix: compile on cenos 6 and clang 3.34
-
+template Fastcgipp::Http::SessionId::SessionId<char>(
+        const std::basic_string<char>& string);
+template Fastcgipp::Http::SessionId::SessionId<wchar_t>(
+        const std::basic_string<wchar_t>& string);
 template<class charT> Fastcgipp::Http::SessionId::SessionId(
         const std::basic_string<charT>& string)
 {
