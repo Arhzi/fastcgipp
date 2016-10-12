@@ -99,11 +99,18 @@ install(FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/include/fastcgi++/webstreambuf.hpp"
     DESTINATION "include/fastcgi++")
 
+#add depend
+add_library(libcpp INTERFACE)
+target_compile_options(libcpp INTERFACE
+  $<$<OR:$<COMPILER_ID:GNU>,$<COMPILER_ID:Clang>>:-lc++>
+)
+
 # All the test stuff
 enable_testing()
 
 add_executable(protocol_test EXCLUDE_FROM_ALL tests/protocol.cpp)
 add_dependencies(protocol_test fastcgipp)
+add_dependencies(protocol_test libcpp)
 target_link_libraries(protocol_test PRIVATE fastcgipp)
 add_test("Fastcgipp::Protocol" protocol_test)
 
