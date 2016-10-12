@@ -570,9 +570,9 @@ namespace Fastcgipp
             }
             
             //***********************************************************
-            template Fastcgipp::Http::SessionId::SessionId<char>(
+            template SessionId<char>(
                        const std::basic_string<char>& string);
-            template Fastcgipp::Http::SessionId::SessionId<wchar_t>(
+            template SessionId<wchar_t>(
                        const std::basic_string<wchar_t>& string);
             //***********************************************************
 
