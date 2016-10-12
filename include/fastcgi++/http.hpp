@@ -568,6 +568,13 @@ namespace Fastcgipp
             {
                 std::copy(x.m_data.begin(), x.m_data.end(), m_data.begin());
             }
+            
+            //***********************************************************
+            template Fastcgipp::Http::SessionId::SessionId<char>(
+                       const std::basic_string<char>& string);
+            template Fastcgipp::Http::SessionId::SessionId<wchar_t>(
+                       const std::basic_string<wchar_t>& string);
+            //***********************************************************
 
             //! Initialize the ID data with a base64 encoded string
             /*!
