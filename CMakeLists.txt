@@ -105,7 +105,7 @@ install(FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/include/fastcgi++/sockets.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/fastcgi++/transceiver.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/fastcgi++/webstreambuf.hpp"
-    DESTINATION ${LIB_INSTALL_PERFIX}"include/fastcgi++")
+    DESTINATION "include/fastcgi++")
 
 #add depend
 set(LIBCPP c++)
