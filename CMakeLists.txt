@@ -25,8 +25,17 @@ endif()
 # We'll need this stuff for sockets stuff
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(SYSTEM "LINUX")
+    set(LIB_INSTALL_PREFIX "/usr/")
+    if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")   
+      set(LIB_PATH_DIR_SUFIX "64")
+    else()
+      set(LIB_PATH_DIR_SUFIX "")
+    endif()
 elseif(UNIX)
     set(SYSTEM "UNIX")
+    set(LIB_INSTALL_PREFIX "/usr/local/")
+    set(LIB_PATH_DIR_SUFIX "")
+    endif()
 elseif(WIN32)
     message(FATAL_ERROR "Windows systems not supported")
     set(SYSTEM "WINDOWS")
@@ -66,7 +75,7 @@ add_library(fastcgipp SHARED
     src/manager.cpp)
 set_target_properties(fastcgipp PROPERTIES VERSION ${VERSION}
                                            SOVERSION ${VERSION_MAJOR})
-install(TARGETS fastcgipp LIBRARY DESTINATION ${LIB_SUFFIX})
+install(TARGETS fastcgipp LIBRARY DESTINATION ${LIB_INSTALL_PREFIX}lib${LIB_PATH_DIR_SUFIX}${LIB_SUFFIX})
 
 
 # A static version of the library
