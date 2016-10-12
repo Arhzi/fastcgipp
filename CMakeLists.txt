@@ -66,7 +66,7 @@ add_library(fastcgipp SHARED
     src/manager.cpp)
 set_target_properties(fastcgipp PROPERTIES VERSION ${VERSION}
                                            SOVERSION ${VERSION_MAJOR})
-install(TARGETS fastcgipp LIBRARY DESTINATION lib${LIB_SUFFIX})
+install(TARGETS fastcgipp LIBRARY DESTINATION ${LIB_SUFFIX})
 
 
 # A static version of the library
