@@ -640,7 +640,7 @@ Fastcgipp::Http::SessionId::SessionId()
 }
 
 //fix: compile on cenos 6 and clang 3.34
-template Fastcgipp::Http::SessionId::SessionId<char>(
+/*template Fastcgipp::Http::SessionId::SessionId<char>(
         const std::basic_string<char>& string);
 template Fastcgipp::Http::SessionId::SessionId<wchar_t>(
         const std::basic_string<wchar_t>& string);
@@ -652,7 +652,7 @@ template<class charT> Fastcgipp::Http::SessionId::SessionId(
             string.begin()+std::min(stringLength, string.size()),
             m_data.begin());
     m_timestamp = std::time(nullptr);
-}
+}*/
 
 const size_t Fastcgipp::Http::SessionId::stringLength;
 const size_t Fastcgipp::Http::SessionId::size;
