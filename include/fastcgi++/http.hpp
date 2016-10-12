@@ -42,6 +42,7 @@
 #include <ctime>
 #include <cstring>
 #include <atomic>
+#include <sstream>
 
 #include <fastcgi++/protocol.hpp>
 
@@ -568,6 +569,13 @@ namespace Fastcgipp
             {
                 std::copy(x.m_data.begin(), x.m_data.end(), m_data.begin());
             }
+            
+            /***********************************************************
+            template<char> SessionId(
+                       const std::basic_string<char>& string);
+            template<wchar_t> SessionId(
+                       const std::basic_string<wchar_t>& string);
+            ***********************************************************/
 
             //! Initialize the ID data with a base64 encoded string
             /*!
@@ -577,12 +585,18 @@ namespace Fastcgipp
              * @param[in] string Reference to base64 encoded string
              */
             template<class charT>
-            SessionId(const std::basic_string<charT>& string);
+            SessionId(const std::basic_string<charT>& string) {
+               base64Decode(
+               string.begin(),
+               string.begin()+std::min(stringLength, string.size()),
+               m_data.begin());
+               m_timestamp = std::time(nullptr);
+            }
 
             template<class charT, class Traits>
             friend std::basic_ostream<charT, Traits>& operator<<(
                     std::basic_ostream<charT, Traits>& os,
-                    const SessionId& x);
+                    const SessionId& x); 
 
             bool operator<(const SessionId& x) const
             {
