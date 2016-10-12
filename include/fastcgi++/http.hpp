@@ -571,9 +571,9 @@ namespace Fastcgipp
             
             //***********************************************************
             template SessionId<char>(
-                       const std::basic_string<char>& string);
+                       const std::basic_string<char>& string){}
             template SessionId<wchar_t>(
-                       const std::basic_string<wchar_t>& string);
+                       const std::basic_string<wchar_t>& string){}
             //***********************************************************
 
             //! Initialize the ID data with a base64 encoded string
