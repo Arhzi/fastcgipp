@@ -100,9 +100,10 @@ install(FILES
     DESTINATION "include/fastcgi++")
 
 #add depend
-add_library(libcpp INTERFACE)
-target_compile_options(libcpp INTERFACE
-  $<$<OR:$<COMPILER_ID:GNU>,$<COMPILER_ID:Clang>>:-lc++>
+set(LIBCPP lc++)
+#add_library(libcpp INTERFACE)
+target_compile_options(libcpp PUBLIC
+  $<$<OR:$<COMPILER_ID:GNU>,$<COMPILER_ID:Clang>>:-${LIBCPP}>
 )
 
 # All the test stuff
