@@ -134,7 +134,7 @@ add_executable(transceiver_test EXCLUDE_FROM_ALL tests/transceiver.cpp)
 add_dependencies(transceiver_test fastcgipp)
 target_link_libraries(transceiver_test PRIVATE fastcgipp)
 target_compile_options(transceiver_test PUBLIC
-  $<-${LIBCPP}>
+  -${LIBCPP}
 )
 add_test("Fastcgipp::Transceiver" transceiver_test)
 
