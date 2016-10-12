@@ -101,10 +101,6 @@ install(FILES
 
 #add depend
 set(LIBCPP lc++)
-#add_library(libcpp INTERFACE)
-target_compile_options(libcpp PUBLIC
-  $<$<OR:$<COMPILER_ID:GNU>,$<COMPILER_ID:Clang>>:-${LIBCPP}>
-)
 
 # All the test stuff
 enable_testing()
@@ -113,26 +109,41 @@ add_executable(protocol_test EXCLUDE_FROM_ALL tests/protocol.cpp)
 add_dependencies(protocol_test fastcgipp)
 add_dependencies(protocol_test libcpp)
 target_link_libraries(protocol_test PRIVATE fastcgipp)
+target_compile_options(protocol_test PUBLIC
+  $<$<OR:$<COMPILER_ID:GNU>,$<COMPILER_ID:Clang>>:-${LIBCPP}>
+)
 add_test("Fastcgipp::Protocol" protocol_test)
 
 add_executable(http_test EXCLUDE_FROM_ALL tests/http.cpp)
 add_dependencies(http_test fastcgipp)
 target_link_libraries(http_test PRIVATE fastcgipp)
+target_compile_options(http_test PUBLIC
+  $<$<OR:$<COMPILER_ID:GNU>,$<COMPILER_ID:Clang>>:-${LIBCPP}>
+)
 add_test("Fastcgipp::Http" http_test)
 
 add_executable(sockets_test EXCLUDE_FROM_ALL tests/sockets.cpp)
 add_dependencies(sockets_test fastcgipp)
 target_link_libraries(sockets_test PRIVATE fastcgipp)
+target_compile_options(sockets_test PUBLIC
+  $<$<OR:$<COMPILER_ID:GNU>,$<COMPILER_ID:Clang>>:-${LIBCPP}>
+)
 add_test("Fastcgipp::Sockets" sockets_test)
 
 add_executable(transceiver_test EXCLUDE_FROM_ALL tests/transceiver.cpp)
 add_dependencies(transceiver_test fastcgipp)
 target_link_libraries(transceiver_test PRIVATE fastcgipp)
+target_compile_options(transceiver_test PUBLIC
+  $<$<OR:$<COMPILER_ID:GNU>,$<COMPILER_ID:Clang>>:-${LIBCPP}>
+)
 add_test("Fastcgipp::Transceiver" transceiver_test)
 
 add_executable(fcgistreambuf_test EXCLUDE_FROM_ALL tests/fcgistreambuf.cpp)
 add_dependencies(fcgistreambuf_test fastcgipp)
 target_link_libraries(fcgistreambuf_test PRIVATE fastcgipp)
+target_compile_options(fcgistreambuf_test PUBLIC
+  $<$<OR:$<COMPILER_ID:GNU>,$<COMPILER_ID:Clang>>:-${LIBCPP}>
+)
 add_test("Fastcgipp::FcgiStreambuf" fcgistreambuf_test)
 
 add_custom_target(
