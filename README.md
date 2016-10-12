@@ -89,6 +89,10 @@ Or if you want some really hardcore debug and diagnostics info
 
     cmake -DCMAKE_BUILD_TYPE=DEBUG -D LOG_LEVEL:INT=4 ../fastcgi++
 
+Run cmake for linux based os:
+
+     cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=/usr ../fastcgipp
+
 Now let's build the library itself.
 
     make
