@@ -148,22 +148,27 @@ add_custom_target(
 
 add_executable(helloworld.fcgi EXCLUDE_FROM_ALL examples/helloworld.cpp)
 add_dependencies(helloworld.fcgi fastcgipp)
+target_link_libraries(helloworld.fcgi PUBLIC ${LIBCPP})
 target_link_libraries(helloworld.fcgi PRIVATE fastcgipp)
 
 add_executable(echo.fcgi EXCLUDE_FROM_ALL examples/echo.cpp)
 add_dependencies(echo.fcgi fastcgipp)
+target_link_libraries(echo.fcgi PUBLIC ${LIBCPP})
 target_link_libraries(echo.fcgi PRIVATE fastcgipp)
 
 add_executable(gnu.fcgi EXCLUDE_FROM_ALL examples/gnu.cpp)
 add_dependencies(gnu.fcgi fastcgipp)
+target_link_libraries(gnu.fcgi PUBLIC ${LIBCPP})
 target_link_libraries(gnu.fcgi PRIVATE fastcgipp)
 
 add_executable(sessions.fcgi EXCLUDE_FROM_ALL examples/sessions.cpp)
 add_dependencies(sessions.fcgi fastcgipp)
+target_link_libraries(sessions.fcgi PUBLIC ${LIBCPP})
 target_link_libraries(sessions.fcgi PRIVATE fastcgipp)
 
 add_executable(timer.fcgi EXCLUDE_FROM_ALL examples/timer.cpp)
 add_dependencies(timer.fcgi fastcgipp)
+target_link_libraries(timer.fcgi PUBLIC ${LIBCPP})
 target_link_libraries(timer.fcgi PRIVATE fastcgipp)
 
 add_custom_target(
