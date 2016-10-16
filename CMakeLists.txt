@@ -45,11 +45,11 @@ endif()
 # Set compile flags for gcc and clang
 if(UNIX)
     set(CMAKE_CXX_FLAGS
-        "$ENV{CXXFLAGS} -std=c++1y -Wall -Werror -Wold-style-cast -pthread")
+        "$ENV{CXXFLAGS} -std=c++14 -Wall -Werror -Wold-style-cast -pthread")
     set(CMAKE_CXX_FLAGS_RELEASE
-        "$ENV{CXXFLAGS} -O3 -fomit-frame-pointer -std=c++1y -Wall -Werror -Wold-style-cast -pthread")
+        "$ENV{CXXFLAGS} -O3 -fomit-frame-pointer -std=c++14 -Wall -Werror -Wold-style-cast -pthread")
     set(CMAKE_CXX_FLAGS_DEBUG
-        "$ENV{CXXFLAGS} -Og -fno-omit-frame-pointer -g -ggdb -std=c++1y -Wall -Werror -Wold-style-cast -pthread")
+        "$ENV{CXXFLAGS} -Og -fno-omit-frame-pointer -g -ggdb -std=c++14 -Wall -Werror -Wold-style-cast -pthread")
 endif()
 
 include_directories(
@@ -108,7 +108,9 @@ install(FILES
     DESTINATION "include/fastcgi++")
 
 #add depend
-set(LIBCPP c++)
+if(CLANG)
+  set(LIBCPP c++)
+endif()
 
 # All the test stuff
 enable_testing()
@@ -117,31 +119,41 @@ add_executable(protocol_test EXCLUDE_FROM_ALL tests/protocol.cpp)
 add_dependencies(protocol_test fastcgipp)
 #add_dependencies(protocol_test ${LIBCPP})
 target_link_libraries(protocol_test PRIVATE fastcgipp)
-target_link_libraries(protocol_test PUBLIC ${LIBCPP})
+if(CLANG)
+  target_link_libraries(protocol_test PUBLIC ${LIBCPP})
+endif()
 add_test("Fastcgipp::Protocol" protocol_test)
 
 add_executable(http_test EXCLUDE_FROM_ALL tests/http.cpp)
 add_dependencies(http_test fastcgipp)
 target_link_libraries(http_test PRIVATE fastcgipp)
-target_link_libraries(http_test PUBLIC ${LIBCPP})
+if(CLANG)
+  target_link_libraries(http_test PUBLIC ${LIBCPP})
+endif()
 add_test("Fastcgipp::Http" http_test)
 
 add_executable(sockets_test EXCLUDE_FROM_ALL tests/sockets.cpp)
 add_dependencies(sockets_test fastcgipp)
 target_link_libraries(sockets_test PRIVATE fastcgipp)
-target_link_libraries(sockets_test PUBLIC ${LIBCPP})
+if(CLANG)
+  target_link_libraries(sockets_test PUBLIC ${LIBCPP})
+endif()
 add_test("Fastcgipp::Sockets" sockets_test)
 
 add_executable(transceiver_test EXCLUDE_FROM_ALL tests/transceiver.cpp)
 add_dependencies(transceiver_test fastcgipp)
 target_link_libraries(transceiver_test PRIVATE fastcgipp)
-target_link_libraries(transceiver_test PUBLIC ${LIBCPP})
+if(CLANG)
+  target_link_libraries(transceiver_test PUBLIC ${LIBCPP})
+endif()
 add_test("Fastcgipp::Transceiver" transceiver_test)
 
 add_executable(fcgistreambuf_test EXCLUDE_FROM_ALL tests/fcgistreambuf.cpp)
 add_dependencies(fcgistreambuf_test fastcgipp)
 target_link_libraries(fcgistreambuf_test PRIVATE fastcgipp)
-target_link_libraries(fcgistreambuf_test PUBLIC ${LIBCPP})
+if(CLANG)
+  target_link_libraries(fcgistreambuf_test PUBLIC ${LIBCPP})
+endif()
 add_test("Fastcgipp::FcgiStreambuf" fcgistreambuf_test)
 
 add_custom_target(
@@ -156,27 +168,37 @@ add_custom_target(
 
 add_executable(helloworld.fcgi EXCLUDE_FROM_ALL examples/helloworld.cpp)
 add_dependencies(helloworld.fcgi fastcgipp)
-target_link_libraries(helloworld.fcgi PUBLIC ${LIBCPP})
+if(CLANG)
+  target_link_libraries(helloworld.fcgi PUBLIC ${LIBCPP})
+endif()
 target_link_libraries(helloworld.fcgi PRIVATE fastcgipp)
 
 add_executable(echo.fcgi EXCLUDE_FROM_ALL examples/echo.cpp)
 add_dependencies(echo.fcgi fastcgipp)
-target_link_libraries(echo.fcgi PUBLIC ${LIBCPP})
+if(CLANG)
+  target_link_libraries(echo.fcgi PUBLIC ${LIBCPP})
+endif()
 target_link_libraries(echo.fcgi PRIVATE fastcgipp)
 
 add_executable(gnu.fcgi EXCLUDE_FROM_ALL examples/gnu.cpp)
 add_dependencies(gnu.fcgi fastcgipp)
-target_link_libraries(gnu.fcgi PUBLIC ${LIBCPP})
+if(CLANG)
+  target_link_libraries(gnu.fcgi PUBLIC ${LIBCPP})
+endif()
 target_link_libraries(gnu.fcgi PRIVATE fastcgipp)
 
 add_executable(sessions.fcgi EXCLUDE_FROM_ALL examples/sessions.cpp)
 add_dependencies(sessions.fcgi fastcgipp)
-target_link_libraries(sessions.fcgi PUBLIC ${LIBCPP})
+if(CLANG)
+  target_link_libraries(sessions.fcgi PUBLIC ${LIBCPP})
+endif()
 target_link_libraries(sessions.fcgi PRIVATE fastcgipp)
 
 add_executable(timer.fcgi EXCLUDE_FROM_ALL examples/timer.cpp)
 add_dependencies(timer.fcgi fastcgipp)
-target_link_libraries(timer.fcgi PUBLIC ${LIBCPP})
+if(CLANG)
+  target_link_libraries(timer.fcgi PUBLIC ${LIBCPP})
+endif()
 target_link_libraries(timer.fcgi PRIVATE fastcgipp)
 
 add_custom_target(
