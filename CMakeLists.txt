@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 project(fastcgi++ CXX)
 
-set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+#set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
-enable_language(CXX)
+#enable_language(CXX)
 
 set(VERSION      "3.0beta")
 set(VERSION_MAJOR 3)
