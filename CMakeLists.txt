@@ -9,6 +9,7 @@ set(SRC_FILES
     "src/block.cpp"
     "src/http.cpp"
     "src/protocol.cpp"
+    "src/poll.cpp"
     "src/sockets.cpp"
     "src/transceiver.cpp"
     "src/fcgistreambuf.cpp"
@@ -17,7 +18,8 @@ set(SRC_FILES
     "src/manager.cpp"
     "src/address.cpp"
     "src/mailer.cpp"
-    "src/email.cpp")
+    "src/email.cpp"
+    "src/chunkstreambuf.cpp")
 set(TESTS
     "protocol"
     "http"
@@ -96,6 +98,13 @@ if(SQL)
     list(APPEND EXAMPLES "sql")
 endif(SQL)
 
+find_package(CURL)
+if(CURL_FOUND)
+    list(APPEND SRC_FILES "src/curl.cpp")
+    list(APPEND SRC_FILES "src/curler.cpp")
+    list(APPEND TESTS "curl")
+endif(CURL_FOUND)
+
 # Build the library itself
 option(BUILD_STATIC_LIBS "Set to ON to build and install only the static library" OFF)
 if(BUILD_STATIC_LIBS)
@@ -166,6 +175,11 @@ if(SQL)
         "${CMAKE_CURRENT_SOURCE_DIR}/include/fastcgi++/sql"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/fastcgi++")
 endif(SQL)
+
+if(CURL_FOUND)
+    target_link_libraries(fastcgipp PUBLIC ${CURL_LIBRARIES})
+    target_include_directories(fastcgipp PRIVATE ${CURL_INCLUDE_DIRS})
+endif(CURL_FOUND)
 
 # Install the config header file
 install(FILES
