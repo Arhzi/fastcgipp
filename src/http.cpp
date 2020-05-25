@@ -668,7 +668,6 @@ Fastcgipp::Http::SessionId::SessionId()
 }
 
 template Fastcgipp::Http::SessionId::SessionId(
-/*template Fastcgipp::Http::SessionId::SessionId<char>(
         const std::basic_string<char>& string);
 template Fastcgipp::Http::SessionId::SessionId(
         const std::basic_string<wchar_t>& string);
@@ -680,7 +679,7 @@ template<class charT> Fastcgipp::Http::SessionId::SessionId(
             string.begin()+std::min(stringLength, string.size()),
             m_data.begin());
     m_timestamp = std::time(nullptr);
-}*/
+}
 
 const size_t Fastcgipp::Http::SessionId::stringLength;
 const size_t Fastcgipp::Http::SessionId::size;
@@ -764,7 +763,7 @@ extern const std::array<const char, 64> Fastcgipp::Http::base64Characters =
 
 const std::array<const char* const, 9> Fastcgipp::Http::requestMethodLabels =
 {{
-   { "ERROR",
+    "ERROR",
     "HEAD",
     "GET",
     "POST",
@@ -772,5 +771,5 @@ const std::array<const char* const, 9> Fastcgipp::Http::requestMethodLabels =
     "DELETE",
     "TRACE",
     "OPTIONS",
-    "CONNECT" }
+    "CONNECT"
 }};
