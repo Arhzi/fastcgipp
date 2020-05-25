@@ -202,7 +202,9 @@ namespace Fastcgipp
 
         //! Handles low level communication with the other side
         Transceiver m_transceiver;
-
+        
+    //warning: just compile on centos 6 and clang 3.34
+    public:
     private:
         //! Queue for pending tasks
         std::queue<Protocol::RequestId> m_tasks;

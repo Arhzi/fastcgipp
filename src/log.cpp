@@ -88,12 +88,12 @@ namespace Fastcgipp
 
         std::array<std::wstring, 6> levels
         {{
-            L"[info]: ",
+            {L"[info]: ",
             L"[fail]: ",
             L"[error]: ",
             L"[warning]: ",
             L"[debug]: ",
-            L"[diagnostic]: "
+            L"[diagnostic]: "}
         }};
     }
 }

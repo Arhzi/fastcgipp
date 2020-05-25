@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.8)
-project(fastcgi++ VERSION 3.1 LANGUAGES CXX)
+project(fastcgi++ CXX)
+
+set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+
+enable_language(CXX)
 
 string(TIMESTAMP BUILD_TIME UTC)
 
@@ -48,8 +52,16 @@ endif()
 # We'll need this stuff for sockets stuff
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(SYSTEM "LINUX")
+    set(LIB_INSTALL_PREFIX "/usr/")
+    if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")   
+      set(LIB_PATH_DIR_SUFIX "64")
+    else()
+      set(LIB_PATH_DIR_SUFIX "")
+    endif()
 elseif(UNIX)
     set(SYSTEM "UNIX")
+    set(LIB_INSTALL_PREFIX "/usr/local/")
+    set(LIB_PATH_DIR_SUFIX "")
 elseif(WIN32)
     message(FATAL_ERROR "Windows systems not supported")
     set(SYSTEM "WINDOWS")
@@ -61,6 +73,11 @@ endif()
 # Set compile flags for gcc and clang
 if(UNIX)
     set(CMAKE_THREAD_PREFER_PTHREAD ON)
+        "$ENV{CXXFLAGS} -std=c++1y -Wall -Werror -Wold-style-cast -pthread")
+    set(CMAKE_CXX_FLAGS_RELEASE
+        "$ENV{CXXFLAGS} -O3 -fomit-frame-pointer -std=c++1y -Wall -Werror -Wold-style-cast -pthread")
+    set(CMAKE_CXX_FLAGS_DEBUG
+        "$ENV{CXXFLAGS} -Og -fno-omit-frame-pointer -g -ggdb -std=c++1y -Wall -Werror -Wold-style-cast -pthread")
 endif()
 
 #Set RPATH
@@ -97,6 +114,7 @@ if(SQL)
     list(APPEND SRC_FILES "src/connection.cpp")
     list(APPEND EXAMPLES "sql")
 endif(SQL)
+install(TARGETS fastcgipp LIBRARY DESTINATION ${LIB_INSTALL_PREFIX}lib${LIB_PATH_DIR_SUFIX}${LIB_SUFFIX})
 
 find_package(CURL)
 if(CURL_FOUND)
@@ -118,6 +136,7 @@ add_library(Fastcgipp::fastcgipp ALIAS fastcgipp)
 set_target_properties(fastcgipp PROPERTIES VERSION ${PROJECT_VERSION}
                                            SOVERSION ${PROJECT_VERSION_MAJOR})
 
+
 find_package(Threads REQUIRED)
 target_link_libraries(fastcgipp PUBLIC Threads::Threads)
 target_compile_features(fastcgipp PRIVATE cxx_std_14)
@@ -134,6 +153,7 @@ target_include_directories(fastcgipp PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/fastcgi++)
+target_link_libraries(sockets_test PUBLIC ${LIBCPP})
 
 install(TARGETS fastcgipp
     EXPORT FastcgippTargets
