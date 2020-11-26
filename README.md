@@ -121,7 +121,7 @@ Then we can build the documentation if we so desire.
 
 Now let's install it all (doc included if it was built).
 
-    make install
+    sudo make install
 
 Maybe we should build the unit tests?
 

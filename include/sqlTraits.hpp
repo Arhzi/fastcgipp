@@ -2,7 +2,7 @@
  * @file       sqlTraits.hpp
  * @brief      Defines SQL type traits
  * @author     Eddie Carle &lt;eddie@isatec.ca&gt;
- * @date       April 20, 2020
+ * @date       November 16, 2020
  * @copyright  Copyright &copy; 2020 Eddie Carle. This project is released under
  *             the GNU Lesser General Public License Version 3.
  */
@@ -29,8 +29,6 @@
 #ifndef FASTCGIPP_SQL_TRAITS_HPP
 #define FASTCGIPP_SQL_TRAITS_HPP
 
-#include "fastcgi++/http.hpp"
-
 #include <postgres.h>
 #include <libpq-fe.h>
 #include <catalog/pg_type.h>
@@ -38,10 +36,10 @@
 #undef WARNING
 #undef INFO
 #undef ERROR
-// I sure would like to know who thought it clever to define the macro WARNING
-// in these postgresql header files
+
+#include "fastcgi++/http.hpp"
+
 //! Topmost namespace for the fastcgi++ library
-//
 namespace Fastcgipp
 {
     //! Contains all fastcgi++ %SQL facilities
@@ -142,7 +140,7 @@ namespace Fastcgipp
         };
         template<> struct Traits<std::chrono::time_point<std::chrono::system_clock>>
         {
-            static constexpr unsigned oid = TIMESTAMPOID;
+            static constexpr unsigned oid = TIMESTAMPTZOID;
             static bool verifyType(const void* result, int column)
             {
                 const Oid type = PQftype(

@@ -2,7 +2,7 @@
  * @file       curl.hpp
  * @brief      Declares types for composing HTTP requests
  * @author     Eddie Carle &lt;eddie@isatec.ca&gt;
- * @date       May 7, 2020
+ * @date       September 10, 2020
  * @copyright  Copyright &copy; 2020 Eddie Carle. This project is released under
  *             the GNU Lesser General Public License Version 3.
  */
@@ -41,7 +41,7 @@ namespace Fastcgipp
 {
     //! De-templated base class for individual Curl requests
     /*!
-     * @date    May 4, 2020
+     * @date    September 10, 2020
      * @author  Eddie Carle &lt;eddie@isatec.ca&gt;
      */
     class Curl_base
@@ -86,7 +86,10 @@ namespace Fastcgipp
         void callback(int messageType=80)
         {
             if(m_streamBuf->m_callback)
+            {
                 m_streamBuf->m_callback(messageType);
+                m_streamBuf->m_callback = std::function<void(Message)>();
+            }
         }
 
         //! Prepare the curl request to be sent out
@@ -110,6 +113,9 @@ namespace Fastcgipp
 
             //! Call function for when the request is complete
             std::function<void(Message)> m_callback;
+
+            //! Curl Error Buffer
+            char m_errorBuffer[256];
 
             virtual ~StreamBuf_base();
 
@@ -208,6 +214,12 @@ namespace Fastcgipp
 
         //! Get the response code from the last request
         unsigned responseCode() const;
+
+        //! Get the error messsage from the most recent operation
+        const char* error() const
+        {
+            return m_streamBuf->m_errorBuffer;
+        }
     };
 
     //! Object for composing curl messages
