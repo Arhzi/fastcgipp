@@ -120,7 +120,7 @@ set_target_properties(fastcgipp PROPERTIES VERSION ${PROJECT_VERSION}
 
 find_package(Threads REQUIRED)
 target_link_libraries(fastcgipp PUBLIC Threads::Threads)
-target_compile_features(fastcgipp PRIVATE cxx_std_14)
+target_compile_features(fastcgipp PUBLIC cxx_std_20)
 if(UNIX)
     if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         target_compile_options(fastcgipp PRIVATE -Wall -Werror -fno-omit-frame-pointer)
@@ -133,7 +133,7 @@ target_include_directories(fastcgipp PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
-set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/fastcgi++)
+set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/Fastcgipp)
 
 install(TARGETS fastcgipp
     EXPORT FastcgippTargets
@@ -145,7 +145,8 @@ install(EXPORT FastcgippTargets
     NAMESPACE Fastcgipp::
     DESTINATION ${INSTALL_CONFIGDIR})
 
-GNUInstallDirs_get_absolute_install_dir(FASTCGIPP_INCLUDE_DIR CMAKE_INSTALL_INCLUDEDIR)
+GNUInstallDirs_get_absolute_install_dir(FASTCGIPP_INCLUDE_DIR
+    CMAKE_INSTALL_INCLUDEDIR INCLUDEDIR)
 
 #Create a ConfigVersion.cmake file
 include(CMakePackageConfigHelpers)

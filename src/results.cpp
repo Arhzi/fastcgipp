@@ -2,13 +2,13 @@
  * @file       results.cpp
  * @brief      Defines SQL results types
  * @author     Eddie Carle &lt;eddie@isatec.ca&gt;
- * @date       December 2, 2020
- * @copyright  Copyright &copy; 2020 Eddie Carle. This project is released under
+ * @date       February 16, 2022
+ * @copyright  Copyright &copy; 2022 Eddie Carle. This project is released under
  *             the GNU Lesser General Public License Version 3.
  */
 
 /*******************************************************************************
-* Copyright (C) 2020 Eddie Carle [eddie@isatec.ca]                             *
+* Copyright (C) 2022 Eddie Carle [eddie@isatec.ca]                             *
 *                                                                              *
 * This file is part of fastcgi++.                                              *
 *                                                                              *
@@ -27,62 +27,46 @@
 *******************************************************************************/
 
 #include "fastcgi++/sql/results.hpp"
-#include "fastcgi++/endian.hpp"
 #include "fastcgi++/log.hpp"
 #include "sqlTraits.hpp"
 
 #include <locale>
 #include <codecvt>
 #include <cstdio>
+#include <map>
+
+using namespace Fastcgipp::SQL;
 
 // Column verification
 
 template<typename T>
-bool Fastcgipp::SQL::Results_base::verifyColumn(int column) const
+bool Results_base::verifyColumn(int column) const
 {
     return Traits<T>::verifyType(m_res, column);
 }
-template bool Fastcgipp::SQL::Results_base::verifyColumn<bool>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<int16_t>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<int32_t>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<int64_t>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<float>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<double>(
-        int column) const;
-template bool
-Fastcgipp::SQL::Results_base::verifyColumn<std::chrono::time_point<std::chrono::system_clock>>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<Fastcgipp::Address>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<std::string>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<std::wstring>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<std::vector<char>>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<std::vector<int16_t>>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<std::vector<int32_t>>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<std::vector<int64_t>>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<std::vector<float>>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<std::vector<double>>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<std::vector<std::string>>(
-        int column) const;
-template bool Fastcgipp::SQL::Results_base::verifyColumn<std::vector<std::wstring>>(
-        int column) const;
+template bool Results_base::verifyColumn<BOOL>(int column) const;
+template bool Results_base::verifyColumn<SMALLINT>(int column) const;
+template bool Results_base::verifyColumn<INTEGER>(int column) const;
+template bool Results_base::verifyColumn<BIGINT>(int column) const;
+template bool Results_base::verifyColumn<REAL>(int column) const;
+template bool Results_base::verifyColumn<DOUBLE_PRECISION>(int column) const;
+template bool Results_base::verifyColumn<TIMESTAMPTZ>(int column) const;
+template bool Results_base::verifyColumn<DATE>(int column) const;
+template bool Results_base::verifyColumn<INET>(int column) const;
+template bool Results_base::verifyColumn<TEXT>(int column) const;
+template bool Results_base::verifyColumn<WTEXT>(int column) const;
+template bool Results_base::verifyColumn<ARRAY<char>>(int column) const;
+template bool Results_base::verifyColumn<ARRAY<SMALLINT>>(int column) const;
+template bool Results_base::verifyColumn<ARRAY<INTEGER>>(int column) const;
+template bool Results_base::verifyColumn<ARRAY<BIGINT>>(int column) const;
+template bool Results_base::verifyColumn<ARRAY<REAL>>(int column) const;
+template bool Results_base::verifyColumn<ARRAY<DOUBLE_PRECISION>>(int column) const;
+template bool Results_base::verifyColumn<ARRAY<TEXT>>(int column) const;
+template bool Results_base::verifyColumn<ARRAY<WTEXT>>(int column) const;
 
 // Non-array field return
 
-template<typename Numeric> void Fastcgipp::SQL::Results_base::field(
+template<typename Numeric> void Results_base::field(
         int row,
         int column,
         Numeric& value) const
@@ -94,52 +78,52 @@ template<typename Numeric> void Fastcgipp::SQL::Results_base::field(
     value = BigEndian<Numeric>::read(
             PQgetvalue(reinterpret_cast<const PGresult*>(m_res), row, column));
 }
-template void Fastcgipp::SQL::Results_base::field<int16_t>(
+template void Results_base::field<SMALLINT>(
         int row,
         int column,
-        int16_t& value) const;
-template void Fastcgipp::SQL::Results_base::field<int32_t>(
+        SMALLINT& value) const;
+template void Results_base::field<INTEGER>(
         int row,
         int column,
-        int32_t& value) const;
-template void Fastcgipp::SQL::Results_base::field<int64_t>(
+        INTEGER& value) const;
+template void Results_base::field<BIGINT>(
         int row,
         int column,
-        int64_t& value) const;
-template void Fastcgipp::SQL::Results_base::field<float>(
+        BIGINT& value) const;
+template void Results_base::field<REAL>(
         int row,
         int column,
-        float& value) const;
-template void Fastcgipp::SQL::Results_base::field<double>(
+        REAL& value) const;
+template void Results_base::field<DOUBLE_PRECISION>(
         int row,
         int column,
-        double& value) const;
+        DOUBLE_PRECISION& value) const;
 
 // Non-array field return specializations
 
-template<> void Fastcgipp::SQL::Results_base::field<bool>(
+template<> void Results_base::field<BOOL>(
         int row,
         int column,
-        bool& value) const
+        BOOL& value) const
 {
-    value = static_cast<bool>(
+    value = static_cast<BOOL>(
             *PQgetvalue(reinterpret_cast<const PGresult*>(m_res), row, column));
 }
 
-template<> void Fastcgipp::SQL::Results_base::field<std::string>(
+template<> void Results_base::field<TEXT>(
         int row,
         int column,
-        std::string& value) const
+        TEXT& value) const
 {
     value.assign(
             PQgetvalue(reinterpret_cast<const PGresult*>(m_res), row, column),
             PQgetlength(reinterpret_cast<const PGresult*>(m_res), row, column));
 }
 
-template<> void Fastcgipp::SQL::Results_base::field<std::wstring>(
+template<> void Results_base::field<WTEXT>(
         int row,
         int column,
-        std::wstring& value) const
+        WTEXT& value) const
 {
     std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
     const char* const start = PQgetvalue(
@@ -160,23 +144,37 @@ template<> void Fastcgipp::SQL::Results_base::field<std::wstring>(
     }
 }
 
-template<> void Fastcgipp::SQL::Results_base::field<
-  std::chrono::time_point<std::chrono::system_clock>>(
+template<> void Results_base::field<TIMESTAMPTZ>(
           int row,
           int column,
-          std::chrono::time_point<std::chrono::system_clock>& value) const
+          TIMESTAMPTZ& value) const
 {
-    const int64_t count = BigEndian<int64_t>::read(
-            PQgetvalue(reinterpret_cast<const PGresult*>(m_res), row, column));
-
-    const std::chrono::duration<int64_t, std::micro> duration(count);
-
-    value = std::chrono::time_point<std::chrono::system_clock>(
-            std::chrono::duration_cast<std::chrono::system_clock::duration>(
-                duration)+std::chrono::seconds(946684800));
+    using namespace std::chrono;
+    constexpr TIMESTAMPTZ epoch(sys_days{January/1/2000});
+    const microseconds microseconds(
+        BigEndian<BIGINT>::read(PQgetvalue(
+                reinterpret_cast<const PGresult*>(m_res),
+                row,
+                column)));
+    value = epoch + microseconds;
 }
 
-template<> void Fastcgipp::SQL::Results_base::field<Fastcgipp::Address>(
+template<> void Results_base::field<DATE>(
+          int row,
+          int column,
+          DATE& value) const
+{
+    using namespace std::chrono;
+    constexpr time_point<system_clock, days> epoch(sys_days{January/1/2000});
+    const days days(
+        BigEndian<INTEGER>::read(PQgetvalue(
+                reinterpret_cast<const PGresult*>(m_res),
+                row,
+                column)));
+    value = epoch + days;
+}
+
+template<> void Results_base::field<INET>(
         int row,
         int column,
         Address& value) const
@@ -210,10 +208,10 @@ template<> void Fastcgipp::SQL::Results_base::field<Fastcgipp::Address>(
 // Array field returns
 
 template<typename Numeric>
-void Fastcgipp::SQL::Results_base::field(
+void Results_base::field(
         int row,
         int column,
-        std::vector<Numeric>& value) const
+        ARRAY<Numeric>& value) const
 {
     static_assert(
             std::is_integral<Numeric>::value ||
@@ -224,44 +222,44 @@ void Fastcgipp::SQL::Results_base::field(
             row,
             column);
 
-    const int32_t ndim(*reinterpret_cast<const BigEndian<int32_t>*>(
-                start+0*sizeof(int32_t)));
+    const auto ndim(*reinterpret_cast<const ARRAY_SIZE*>(
+                start+0*sizeof(ARRAY_SIZE)));
     if(ndim != 1)
     {
-        WARNING_LOG("SQL result array type for std::vector<Numeric> has "\
+        WARNING_LOG("SQL result array type for ARRAY<Numeric> has "\
                 "ndim != 1");
         return;
     }
 
-    const int32_t hasNull(*reinterpret_cast<const BigEndian<int32_t>*>(
-                start+1*sizeof(int32_t)));
+    const auto hasNull(*reinterpret_cast<const ARRAY_SIZE*>(
+                start+1*sizeof(ARRAY_SIZE)));
     if(hasNull != 0)
     {
-        WARNING_LOG("SQL result array type for std::vector<Numeric> has "\
+        WARNING_LOG("SQL result array type for ARRAY<Numeric> has "\
                 "ndim != 0");
         return;
     }
 
-    const int32_t elementType(*reinterpret_cast<const BigEndian<int32_t>*>(
-                start+2*sizeof(int32_t)));
+    const auto elementType(*reinterpret_cast<const ARRAY_SIZE*>(
+                start+2*sizeof(ARRAY_SIZE)));
     if(elementType != Traits<Numeric>::oid)
     {
-        WARNING_LOG("SQL result array type for std::vector<Numeric> has "\
+        WARNING_LOG("SQL result array type for ARRAY<Numeric> has "\
                 "the wrong element type");
         return;
     }
 
-    const int32_t size(*reinterpret_cast<const BigEndian<int32_t>*>(
-                start+3*sizeof(int32_t)));
+    const auto size(*reinterpret_cast<const ARRAY_SIZE*>(
+                start+3*sizeof(ARRAY_SIZE)));
 
     value.clear();
     value.reserve(size);
     for(int i=0; i<size; ++i)
     {
-        const int32_t length(
-                *reinterpret_cast<const BigEndian<int32_t>*>(
-                    start + 5*sizeof(int32_t)
-                    + i*(sizeof(int32_t) + sizeof(Numeric))));
+        const auto length(
+                *reinterpret_cast<const ARRAY_SIZE*>(
+                    start + 5*sizeof(ARRAY_SIZE)
+                    + i*(sizeof(ARRAY_SIZE) + sizeof(Numeric))));
         if(length != sizeof(Numeric))
         {
             WARNING_LOG("SQL result array for Numeric has element of wrong size");
@@ -269,35 +267,35 @@ void Fastcgipp::SQL::Results_base::field(
         }
 
         value.push_back(*reinterpret_cast<const BigEndian<Numeric>*>(
-                    start + 6*sizeof(int32_t)
-                    + i*(sizeof(int32_t) + sizeof(Numeric))));
+                    start + 6*sizeof(ARRAY_SIZE)
+                    + i*(sizeof(ARRAY_SIZE) + sizeof(Numeric))));
     }
 }
-template void Fastcgipp::SQL::Results_base::field<int16_t>(
+template void Results_base::field<SMALLINT>(
         int row,
         int column,
-        std::vector<int16_t>& value) const;
-template void Fastcgipp::SQL::Results_base::field<int32_t>(
+        ARRAY<SMALLINT>& value) const;
+template void Results_base::field<INTEGER>(
         int row,
         int column,
-        std::vector<int32_t>& value) const;
-template void Fastcgipp::SQL::Results_base::field<int64_t>(
+        ARRAY<INTEGER>& value) const;
+template void Results_base::field<BIGINT>(
         int row,
         int column,
-        std::vector<int64_t>& value) const;
-template void Fastcgipp::SQL::Results_base::field<float>(
+        ARRAY<BIGINT>& value) const;
+template void Results_base::field<REAL>(
         int row,
         int column,
-        std::vector<float>& value) const;
-template void Fastcgipp::SQL::Results_base::field<double>(
+        ARRAY<REAL>& value) const;
+template void Results_base::field<DOUBLE_PRECISION>(
         int row,
         int column,
-        std::vector<double>& value) const;
+        ARRAY<DOUBLE_PRECISION>& value) const;
 
-template<> void Fastcgipp::SQL::Results_base::field<char>(
+template<> void Results_base::field<char>(
         int row,
         int column,
-        std::vector<char>& value) const
+        ARRAY<char>& value) const
 {
     const unsigned size = PQgetlength(
             reinterpret_cast<const PGresult*>(m_res),
@@ -314,52 +312,52 @@ template<> void Fastcgipp::SQL::Results_base::field<char>(
 }
 
 template<>
-void Fastcgipp::SQL::Results_base::field<std::string>(
+void Results_base::field<TEXT>(
         int row,
         int column,
-        std::vector<std::string>& value) const
+        ARRAY<TEXT>& value) const
 {
     const char* ptr = PQgetvalue(
             reinterpret_cast<const PGresult*>(m_res),
             row,
             column);
 
-    const int32_t ndim(*reinterpret_cast<const BigEndian<int32_t>*>(ptr));
-    ptr += sizeof(int32_t);
+    const auto ndim(*reinterpret_cast<const ARRAY_SIZE*>(ptr));
+    ptr += sizeof(ARRAY_SIZE);
     if(ndim != 1)
     {
-        WARNING_LOG("SQL result array type for std::vector<std::string> has "\
+        WARNING_LOG("SQL result array type for ARRAY<TEXT> has "\
                 "ndim != 1");
         return;
     }
 
-    const int32_t hasNull(*reinterpret_cast<const BigEndian<int32_t>*>(ptr));
-    ptr += sizeof(int32_t);
+    const auto hasNull(*reinterpret_cast<const ARRAY_SIZE*>(ptr));
+    ptr += sizeof(ARRAY_SIZE);
     if(hasNull != 0)
     {
-        WARNING_LOG("SQL result array type for std::vector<std::string> has "\
+        WARNING_LOG("SQL result array type for ARRAY<TEXT> has "\
                 "ndim != 0");
         return;
     }
 
-    const int32_t elementType(*reinterpret_cast<const BigEndian<int32_t>*>(ptr));
-    ptr += sizeof(int32_t);
-    if(elementType != Traits<std::string>::oid)
+    const auto elementType(*reinterpret_cast<const ARRAY_SIZE*>(ptr));
+    ptr += sizeof(ARRAY_SIZE);
+    if(elementType != Traits<TEXT>::oid)
     {
-        WARNING_LOG("SQL result array type for std::vector<std::string> has "\
+        WARNING_LOG("SQL result array type for ARRAY<TEXT> has "\
                 "the wrong element type");
         return;
     }
 
-    const int32_t size(*reinterpret_cast<const BigEndian<int32_t>*>(ptr));
-    ptr += 2*sizeof(int32_t);
+    const auto size(*reinterpret_cast<const ARRAY_SIZE*>(ptr));
+    ptr += 2*sizeof(ARRAY_SIZE);
 
     value.clear();
     value.reserve(size);
     for(int i=0; i<size; ++i)
     {
-        const int32_t length(*reinterpret_cast<const BigEndian<int32_t>*>(ptr));
-        ptr += sizeof(int32_t);
+        const auto length(*reinterpret_cast<const ARRAY_SIZE*>(ptr));
+        ptr += sizeof(ARRAY_SIZE);
 
         value.emplace_back(ptr, length);
         ptr += length;
@@ -367,45 +365,45 @@ void Fastcgipp::SQL::Results_base::field<std::string>(
 }
 
 template<>
-void Fastcgipp::SQL::Results_base::field<std::wstring>(
+void Results_base::field<WTEXT>(
         int row,
         int column,
-        std::vector<std::wstring>& value) const
+        ARRAY<WTEXT>& value) const
 {
     const char* ptr = PQgetvalue(
             reinterpret_cast<const PGresult*>(m_res),
             row,
             column);
 
-    const int32_t ndim(*reinterpret_cast<const BigEndian<int32_t>*>(ptr));
-    ptr += sizeof(int32_t);
+    const auto ndim(*reinterpret_cast<const ARRAY_SIZE*>(ptr));
+    ptr += sizeof(ARRAY_SIZE);
     if(ndim != 1)
     {
-        WARNING_LOG("SQL result array type for std::vector<std::string> has "\
+        WARNING_LOG("SQL result array type for ARRAY<WTEXT> has "\
                 "ndim != 1");
         return;
     }
 
-    const int32_t hasNull(*reinterpret_cast<const BigEndian<int32_t>*>(ptr));
-    ptr += sizeof(int32_t);
+    const auto hasNull(*reinterpret_cast<const ARRAY_SIZE*>(ptr));
+    ptr += sizeof(ARRAY_SIZE);
     if(hasNull != 0)
     {
-        WARNING_LOG("SQL result array type for std::vector<std::string> has "\
+        WARNING_LOG("SQL result array type for ARRAY<WTEXT> has "\
                 "ndim != 0");
         return;
     }
 
-    const int32_t elementType(*reinterpret_cast<const BigEndian<int32_t>*>(ptr));
-    ptr += sizeof(int32_t);
-    if(elementType != Traits<std::string>::oid)
+    const auto elementType(*reinterpret_cast<const ARRAY_SIZE*>(ptr));
+    ptr += sizeof(ARRAY_SIZE);
+    if(elementType != Traits<TEXT>::oid)
     {
-        WARNING_LOG("SQL result array type for std::vector<std::string> has "\
+        WARNING_LOG("SQL result array type for ARRAY<WTEXT> has "\
                 "the wrong element type");
         return;
     }
 
-    const int32_t size(*reinterpret_cast<const BigEndian<int32_t>*>(ptr));
-    ptr += 2*sizeof(int32_t);
+    const auto size(*reinterpret_cast<const ARRAY_SIZE*>(ptr));
+    ptr += 2*sizeof(ARRAY_SIZE);
 
     value.clear();
     value.reserve(size);
@@ -414,8 +412,8 @@ void Fastcgipp::SQL::Results_base::field<std::wstring>(
     {
         for(int i=0; i<size; ++i)
         {
-            const int32_t length(*reinterpret_cast<const BigEndian<int32_t>*>(ptr));
-            ptr += sizeof(int32_t);
+            const auto length(*reinterpret_cast<const ARRAY_SIZE*>(ptr));
+            ptr += sizeof(ARRAY_SIZE);
 
             value.emplace_back(std::move(
                         converter.from_bytes(ptr, ptr+length)));
@@ -430,58 +428,54 @@ void Fastcgipp::SQL::Results_base::field<std::wstring>(
 
 // Done result fields
 
-Fastcgipp::SQL::Status Fastcgipp::SQL::Results_base::status() const
+Status Results_base::status() const
 {
+    static const std::map<ExecStatusType, Status> statuses{
+        {PGRES_EMPTY_QUERY, Status::emptyQuery},
+        {PGRES_COMMAND_OK, Status::commandOk},
+        {PGRES_TUPLES_OK, Status::rowsOk},
+        {PGRES_COPY_OUT, Status::copyOut},
+        {PGRES_COPY_IN, Status::copyIn},
+        {PGRES_BAD_RESPONSE, Status::badResponse},
+        {PGRES_NONFATAL_ERROR, Status::nonfatalError},
+        {PGRES_COPY_BOTH, Status::copyBoth},
+        {PGRES_SINGLE_TUPLE, Status::singleTuple},
+    };
+
     if(reinterpret_cast<const PGresult*>(m_res) == nullptr)
         return Status::noResult;
 
-    switch(PQresultStatus(reinterpret_cast<const PGresult*>(m_res)))
-    {
-        case PGRES_EMPTY_QUERY:
-            return Status::emptyQuery;
-        case PGRES_COMMAND_OK:
-            return Status::commandOk;
-        case PGRES_TUPLES_OK:
-            return Status::rowsOk;
-        case PGRES_COPY_OUT:
-            return Status::copyOut;
-        case PGRES_COPY_IN:
-            return Status::copyIn;
-        case PGRES_BAD_RESPONSE:
-            return Status::badResponse;
-        case PGRES_NONFATAL_ERROR:
-            return Status::nonfatalError;
-        case PGRES_COPY_BOTH:
-            return Status::copyBoth;
-        case PGRES_SINGLE_TUPLE:
-            return Status::singleTuple;
-        default:
-            return Status::fatalError;
-    };
+    const auto status = statuses.find(
+            PQresultStatus(reinterpret_cast<const PGresult*>(m_res)));
+
+    if(status == statuses.end())
+        return Status::fatalError;
+
+    return status->second;
 }
 
-unsigned Fastcgipp::SQL::Results_base::affectedRows() const
+unsigned Results_base::affectedRows() const
 {
     return std::atoi(PQcmdTuples(reinterpret_cast<PGresult*>(m_res)));
 }
 
-Fastcgipp::SQL::Results_base::~Results_base()
+Results_base::~Results_base()
 {
     if(m_res != nullptr)
         PQclear(reinterpret_cast<PGresult*>(m_res));
 }
 
-const char* Fastcgipp::SQL::Results_base::errorMessage() const
+const char* Results_base::errorMessage() const
 {
     return PQresultErrorMessage(reinterpret_cast<const PGresult*>(m_res));
 }
 
-unsigned Fastcgipp::SQL::Results_base::rows() const
+unsigned Results_base::rows() const
 {
     return PQntuples(reinterpret_cast<const PGresult*>(m_res));
 }
 
-bool Fastcgipp::SQL::Results_base::null(int row, int column) const
+bool Results_base::null(int row, int column) const
 {
     return static_cast<bool>(PQgetisnull(
                 reinterpret_cast<const PGresult*>(m_res),
@@ -489,37 +483,31 @@ bool Fastcgipp::SQL::Results_base::null(int row, int column) const
                 column));
 }
 
-int Fastcgipp::SQL::Results_base::columns() const
+int Results_base::columns() const
 {
     return PQnfields(reinterpret_cast<const PGresult*>(m_res));
 }
 
 const char* Fastcgipp::SQL::statusString(const Status status)
 {
-    switch(status)
-    {
-        case Status::noResult:
-            return "No Result";
-        case Status::emptyQuery:
-            return "Empty Query";
-        case Status::commandOk:
-            return "Command OK";
-        case Status::rowsOk:
-            return "Rows OK";
-        case Status::copyOut:
-            return "Copy Out";
-        case Status::copyIn:
-            return "Copy In";
-        case Status::badResponse:
-            return "Bad Response";
-        case Status::nonfatalError:
-            return "Non-fatal Error";
-        case Status::copyBoth:
-            return "Copy Both";
-        case Status::singleTuple:
-            return "Single Tuple";
-        case Status::fatalError:
-        default:
-            return "Fatal Error";
-    }
+    static const std::map<Status, const char*> statuses{
+        {Status::noResult, "No Result"},
+        {Status::emptyQuery, "Empty Query"},
+        {Status::commandOk, "Command OK"},
+        {Status::rowsOk, "Rows OK"},
+        {Status::copyOut, "Copy Out"},
+        {Status::copyIn, "Copy In"},
+        {Status::badResponse, "Bad Response"},
+        {Status::nonfatalError, "Non-fatal Error"},
+        {Status::copyBoth, "Copy Both"},
+        {Status::singleTuple, "Single Tuple"},
+        {Status::fatalError, "Fatal Error"},
+    };
+
+    auto it = statuses.find(status);
+
+    if(it == statuses.end())
+        it = statuses.find(Status::fatalError);
+
+    return it->second;
 }

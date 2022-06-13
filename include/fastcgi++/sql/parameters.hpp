@@ -2,12 +2,12 @@
  * @file       parameters.hpp
  * @brief      Declares %SQL parameters types
  * @author     Eddie Carle &lt;eddie@isatec.ca&gt;
- * @date       December 2, 2020
- * @copyright  Copyright &copy; 2020 Eddie Carle. This project is released under
+ * @date       February 18, 2022
+ * @copyright  Copyright &copy; 2022 Eddie Carle. This project is released under
  *             the GNU Lesser General Public License Version 3.
  */
 /*******************************************************************************
-* Copyright (C) 2020 Eddie Carle [eddie@isatec.ca]                             *
+* Copyright (C) 2022 Eddie Carle [eddie@isatec.ca]                             *
 *                                                                              *
 * This file is part of fastcgi++.                                              *
 *                                                                              *
@@ -29,12 +29,10 @@
 #define FASTCGIPP_SQL_PARAMETERS_HPP
 
 #include "fastcgi++/endian.hpp"
-#include "fastcgi++/address.hpp"
+#include "fastcgi++/sql/types.hpp"
 
 #include <tuple>
-#include <string>
 #include <vector>
-#include <chrono>
 #include <memory>
 
 //! Topmost namespace for the fastcgi++ library
@@ -53,16 +51,16 @@ namespace Fastcgipp
         template<typename T> class Parameter;
 
         template<>
-        class Parameter<bool>
+        class Parameter<BOOL>
         {
         private:
             char m_data;
         public:
             static const unsigned oid;
-            constexpr Parameter(bool x) noexcept:
+            constexpr Parameter(BOOL x) noexcept:
                 m_data(static_cast<char>(x))
             {}
-            constexpr Parameter& operator=(bool x) noexcept
+            constexpr Parameter& operator=(BOOL x) noexcept
             {
                 m_data = static_cast<char>(x);
                 return *this;
@@ -78,121 +76,146 @@ namespace Fastcgipp
         };
 
         template<>
-        struct Parameter<int16_t>: public BigEndian<int16_t>
+        struct Parameter<SMALLINT>: public BigEndian<SMALLINT>
         {
-            using BigEndian<int16_t>::BigEndian;
-            using BigEndian<int16_t>::operator=;
+            using BigEndian<SMALLINT>::BigEndian;
+            using BigEndian<SMALLINT>::operator=;
             static const unsigned oid;
         };
 
         template<>
-        struct Parameter<int32_t>: public BigEndian<int32_t>
+        struct Parameter<INTEGER>: public BigEndian<INTEGER>
         {
-            using BigEndian<int32_t>::BigEndian;
-            using BigEndian<int32_t>::operator=;
+            using BigEndian<INTEGER>::BigEndian;
+            using BigEndian<INTEGER>::operator=;
             static const unsigned oid;
         };
 
         template<>
-        struct Parameter<int64_t>: public BigEndian<int64_t>
+        struct Parameter<BIGINT>: public BigEndian<BIGINT>
         {
-            using BigEndian<int64_t>::BigEndian;
-            using BigEndian<int64_t>::operator=;
+            using BigEndian<BIGINT>::BigEndian;
+            using BigEndian<BIGINT>::operator=;
             static const unsigned oid;
         };
 
         template<>
-        struct Parameter<float>: public BigEndian<float>
+        struct Parameter<REAL>: public BigEndian<REAL>
         {
-            using BigEndian<float>::BigEndian;
-            using BigEndian<float>::operator=;
+            using BigEndian<REAL>::BigEndian;
+            using BigEndian<REAL>::operator=;
             static const unsigned oid;
         };
 
         template<>
-        struct Parameter<double>: public BigEndian<double>
+        struct Parameter<DOUBLE_PRECISION>: public BigEndian<DOUBLE_PRECISION>
         {
-            using BigEndian<double>::BigEndian;
-            using BigEndian<double>::operator=;
+            using BigEndian<DOUBLE_PRECISION>::BigEndian;
+            using BigEndian<DOUBLE_PRECISION>::operator=;
             static const unsigned oid;
         };
 
         template<>
-        struct Parameter<std::string>: public std::string
+        struct Parameter<TEXT>: public TEXT
         {
-            Parameter(const std::string& x):
-                std::string(x)
+            Parameter(const TEXT& x):
+                TEXT(x)
             {}
-            using std::string::string;
-            using std::string::operator=;
+            using TEXT::TEXT;
+            using TEXT::operator=;
             static const unsigned oid;
         };
 
         template<>
-        struct Parameter<std::vector<char>>: public std::vector<char>
+        struct Parameter<BYTEA>: public BYTEA
         {
-            Parameter(const std::vector<char>& x):
-                std::vector<char>(x)
+            Parameter(const BYTEA& x):
+                BYTEA(x)
             {}
-            using std::vector<char>::vector;
-            using std::vector<char>::operator=;
+            using BYTEA::BYTEA;
+            using BYTEA::operator=;
             static const unsigned oid;
         };
 
         template<>
-        class Parameter<std::wstring>: public std::string
+        class Parameter<WTEXT>: public TEXT
         {
         private:
-            static std::string convert(const std::wstring& x);
+            static TEXT convert(const WTEXT& x);
 
         public:
-            Parameter& operator=(const std::wstring& x)
+            Parameter& operator=(const WTEXT& x)
             {
                  assign(convert(x));
                  return *this;
             }
 
-            Parameter(const std::wstring& x):
-                std::string(convert(x))
+            Parameter(const WTEXT& x):
+                TEXT(convert(x))
             {}
 
             static const unsigned oid;
         };
 
         template<>
-        class Parameter<std::chrono::time_point<std::chrono::system_clock>>:
-            public BigEndian<int64_t>
+        class Parameter<TIMESTAMPTZ>:
+            public BigEndian<BIGINT>
         {
         private:
-            using BigEndian<int64_t>::operator=;
-            static int64_t convert(
-                    const std::chrono::time_point<std::chrono::system_clock>& x)
+            using BigEndian<BIGINT>::operator=;
+            static BIGINT convert(const TIMESTAMPTZ& x)
             {
-                return std::chrono::duration_cast<
-                    std::chrono::duration<int64_t, std::micro>>(
-                        x.time_since_epoch()-std::chrono::seconds(946684800)).count();
+                using namespace std::chrono;
+                constexpr TIMESTAMPTZ epoch(sys_days{January/1/2000});
+                return (x-epoch).count();
             }
 
         public:
-            Parameter& operator=(
-                    const std::chrono::time_point<std::chrono::system_clock>& x)
+            Parameter& operator=(const TIMESTAMPTZ& x)
             {
                 *this = convert(x);
                 return *this;
             }
 
-            Parameter(
-                    const std::chrono::time_point<std::chrono::system_clock>& x):
-                BigEndian<int64_t>(convert(x))
+            Parameter(const TIMESTAMPTZ& x):
+                BigEndian<BIGINT>(convert(x))
             {}
 
             static const unsigned oid;
         };
 
         template<>
-        struct Parameter<Address>: public std::array<char, 20>
+        class Parameter<DATE>:
+            public BigEndian<INTEGER>
         {
-            Parameter& operator=(const Address& x)
+        private:
+            using BigEndian<INTEGER>::operator=;
+            static INTEGER convert(const DATE& x)
+            {
+                using namespace std::chrono;
+                constexpr time_point<system_clock, days> epoch(
+                        sys_days{January/1/2000});
+                return (sys_days(x)-epoch).count();
+            }
+
+        public:
+            Parameter& operator=(const DATE& x)
+            {
+                *this = convert(x);
+                return *this;
+            }
+
+            Parameter(const DATE& x):
+                BigEndian<INTEGER>(convert(x))
+            {}
+
+            static const unsigned oid;
+        };
+
+        template<>
+        struct Parameter<INET>: public std::array<char, 20>
+        {
+            Parameter& operator=(const INET& x)
             {
                 auto next = begin();
                 *next++ = addressFamily;
@@ -201,11 +224,11 @@ namespace Fastcgipp
                 *next++ = 16;
                 next = std::copy_n(
                         reinterpret_cast<const char*>(&x),
-                        Address::size,
+                        INET::size,
                         next);
                 return *this;
             }
-            Parameter(const Address& x)
+            Parameter(const INET& x)
             {
                 *this = x;
             }
@@ -214,7 +237,7 @@ namespace Fastcgipp
         };
 
         template<typename Numeric>
-        class Parameter<std::vector<Numeric>>
+        class Parameter<ARRAY<Numeric>>
         {
         private:
             static_assert(
@@ -226,9 +249,9 @@ namespace Fastcgipp
         public:
             void resize(const unsigned size);
 
-            Parameter& operator=(const std::vector<Numeric>& x);
+            Parameter& operator=(const ARRAY<Numeric>& x);
 
-            Parameter(const std::vector<Numeric>& x)
+            Parameter(const ARRAY<Numeric>& x)
             {
                 *this = x;
             }
@@ -241,8 +264,8 @@ namespace Fastcgipp
             BigEndian<Numeric>& operator[](const unsigned i)
             {
                 return *reinterpret_cast<BigEndian<Numeric>*>(
-                        m_data.get() + 6*sizeof(int32_t)
-                        + i*(sizeof(int32_t) + sizeof(Numeric)));
+                        m_data.get() + 6*sizeof(ARRAY_SIZE)
+                        + i*(sizeof(ARRAY_SIZE) + sizeof(Numeric)));
             }
 
             unsigned size() const
@@ -259,26 +282,26 @@ namespace Fastcgipp
         };
 
         template<>
-        class Parameter<std::vector<std::string>>
+        class Parameter<ARRAY<TEXT>>
         {
         private:
             unsigned m_size;
             std::unique_ptr<char[]> m_data;
         protected:
-            void assign(const std::vector<std::string>& x);
+            void assign(const ARRAY<TEXT>& x);
         public:
-            Parameter& operator=(const std::vector<std::string>& x)
+            Parameter& operator=(const ARRAY<TEXT>& x)
             {
                 assign(x);
                 return *this;
             }
 
-            Parameter(const std::vector<std::string>& x)
+            Parameter(const ARRAY<TEXT>& x)
             {
                 assign(x);
             }
 
-            std::string operator[](const unsigned i) const;
+            TEXT operator[](const unsigned i) const;
 
             unsigned size() const
             {
@@ -294,40 +317,46 @@ namespace Fastcgipp
         };
 
         template<>
-        class Parameter<std::vector<std::wstring>>:
-            public Parameter<std::vector<std::string>>
+        class Parameter<ARRAY<WTEXT>>:
+            public Parameter<ARRAY<TEXT>>
         {
         private:
-            static std::vector<std::string> convert(
-                    const std::vector<std::wstring>& x);
-            static std::wstring convert(const std::string& x);
+            static ARRAY<TEXT> convert(
+                    const ARRAY<WTEXT>& x);
+            static WTEXT convert(const TEXT& x);
         public:
-            Parameter& operator=(const std::vector<std::wstring>& x)
+            Parameter& operator=(const ARRAY<WTEXT>& x)
             {
                 assign(convert(x));
                 return *this;
             }
 
-            Parameter(const std::vector<std::wstring>& x):
-                Parameter<std::vector<std::string>>(convert(x))
+            Parameter(const ARRAY<WTEXT>& x):
+                Parameter<ARRAY<TEXT>>(convert(x))
             {}
 
-            std::wstring operator[](const unsigned i) const
+            WTEXT operator[](const unsigned i) const
             {
-                return convert(
-                        Parameter<std::vector<std::string>>::operator[](i));
+                return convert(Parameter<ARRAY<TEXT>>::operator[](i));
             }
         };
 
         //! De-templated base class for Parameters
         class Parameters_base
         {
+        private:
+            //! How many columns do we have?
+            const int m_size;
+
+            //! True indicates null on the respective column
+            std::vector<bool> m_nulls;
+
         protected:
             //! Array of oids for each parameter
             /*!
              * This gets initialized by calling build().
              */
-            const std::vector<unsigned>* m_oids;
+            const std::vector<unsigned>& m_oids;
 
             //! Array of raw data pointers for each parameter
             /*!
@@ -346,17 +375,22 @@ namespace Fastcgipp
              * This gets initialized by calling build(). It is really just an
              * array of 1s.
              */
-            const std::vector<int>* m_formats;
+            const std::vector<int>& m_formats;
 
-            //! Template side virtual to populate the above arrays
-            /*!
-             * This just gets called by build().
-             */
-            virtual void build_impl() =0;
+            Parameters_base(
+                    const std::vector<unsigned>& oids,
+                    const std::vector<int>& formats):
+                m_size(oids.size()),
+                m_nulls(m_size, false),
+                m_oids(oids),
+                m_raws(m_size),
+                m_sizes(m_size),
+                m_formats(formats)
+            {}
 
         public:
             //! Initialize the arrays needed by %SQL
-            void build();
+            virtual void build() =0;
 
             //! Constant pointer to array of all parameter oids
             /*!
@@ -364,7 +398,7 @@ namespace Fastcgipp
              */
             const unsigned* oids() const
             {
-                return m_oids->data();
+                return m_oids.data();
             }
 
             //! Constant pointer to pointer array of all raw parameter data
@@ -385,11 +419,26 @@ namespace Fastcgipp
             //! Constant pointer to array of all formats
             const int* formats() const
             {
-                return m_formats->data();
+                return m_formats.data();
             }
 
             //! How many parameters in this tuple?
-            virtual int size() const =0;
+            int size() const
+            {
+                return m_size;
+            }
+
+            //! Set a single parameter column to null (zero indexed)
+            void setNull(size_t column)
+            {
+                m_nulls[column] = true;
+            }
+
+            //! Check null on a single parameter column (zero indexed)
+            bool isNull(size_t column) const
+            {
+                return m_nulls[column];
+            }
 
             virtual ~Parameters_base() {}
         };
@@ -414,18 +463,15 @@ namespace Fastcgipp
             static const std::vector<unsigned> s_oids;
             static const std::vector<int> s_formats;
 
-            //! How many items in the tuple?
-            constexpr int size() const
-            {
-                return sizeof...(Types);
-            }
-
             //! Recursive template %SQL array building function
             template<size_t column, size_t... columns>
             inline void build_impl(std::index_sequence<column, columns...>)
             {
-                m_raws.push_back(std::get<column>(*this).data());
-                m_sizes.push_back(std::get<column>(*this).size());
+                if(isNull(column))
+                    m_raws[column] = nullptr;
+                else
+                    m_raws[column] = std::get<column>(*this).data();
+                m_sizes[column] = std::get<column>(*this).size();
                 build_impl(std::index_sequence<columns...>{});
             }
 
@@ -433,15 +479,29 @@ namespace Fastcgipp
             template<size_t column>
             inline void build_impl(std::index_sequence<column>)
             {
-                m_raws.push_back(std::get<column>(*this).data());
-                m_sizes.push_back(std::get<column>(*this).size());
+                if(isNull(column))
+                    m_raws[column] = nullptr;
+                else
+                    m_raws[column] = std::get<column>(*this).data();
+                m_sizes[column] = std::get<column>(*this).size();
             }
 
-            void build_impl();
+            void build();
 
-        public:
-            using std::tuple<Parameter<Types>...>::tuple;
-            using std::tuple<Parameter<Types>...>::operator=;
+            Parameters(const std::tuple<Types...>& tuple):
+                std::tuple<Parameter<Types>...>(tuple),
+                Parameters_base(s_oids, s_formats)
+            {}
+
+            Parameters(const Types&... args):
+                std::tuple<Parameter<Types>...>(args...),
+                Parameters_base(s_oids, s_formats)
+            {}
+
+            friend std::shared_ptr<Parameters<Types...>> make_Parameters<>(
+                    const Types&... args);
+            friend std::shared_ptr<Parameters<Types...>> make_Parameters<>(
+                    const std::tuple<Types...>& tuple);
         };
 
         template<typename... Types>
@@ -463,10 +523,8 @@ namespace Fastcgipp
 }
 
 template<typename... Types>
-void Fastcgipp::SQL::Parameters<Types...>::build_impl()
+void Fastcgipp::SQL::Parameters<Types...>::build()
 {
-    m_oids = &s_oids;
-    m_formats = &s_formats;
     build_impl(std::index_sequence_for<Types...>{});
 }
 

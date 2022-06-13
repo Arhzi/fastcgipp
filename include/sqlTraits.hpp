@@ -2,13 +2,13 @@
  * @file       sqlTraits.hpp
  * @brief      Defines SQL type traits
  * @author     Eddie Carle &lt;eddie@isatec.ca&gt;
- * @date       December 2, 2020
- * @copyright  Copyright &copy; 2020 Eddie Carle. This project is released under
+ * @date       February 16, 2022
+ * @copyright  Copyright &copy; 2022 Eddie Carle. This project is released under
  *             the GNU Lesser General Public License Version 3.
  */
 
 /*******************************************************************************
-* Copyright (C) 2020 Eddie Carle [eddie@isatec.ca]                             *
+* Copyright (C) 2022 Eddie Carle [eddie@isatec.ca]                             *
 *                                                                              *
 * This file is part of fastcgi++.                                              *
 *                                                                              *
@@ -29,6 +29,7 @@
 #ifndef FASTCGIPP_SQL_TRAITS_HPP
 #define FASTCGIPP_SQL_TRAITS_HPP
 
+#include <string>
 #include <postgres.h>
 #include <libpq-fe.h>
 #include <catalog/pg_type.h>
@@ -37,7 +38,7 @@
 #undef INFO
 #undef ERROR
 
-#include "fastcgi++/http.hpp"
+#include "fastcgi++/sql/types.hpp"
 
 //! Topmost namespace for the fastcgi++ library
 namespace Fastcgipp
@@ -46,7 +47,7 @@ namespace Fastcgipp
     namespace SQL
     {
         template<typename T> struct Traits {};
-        template<> struct Traits<bool>
+        template<> struct Traits<BOOL>
         {
             static constexpr unsigned oid = BOOLOID;
             static bool verifyType(const void* result, int column)
@@ -60,7 +61,7 @@ namespace Fastcgipp
                 return type == oid && size == 1;
             }
         };
-        template<> struct Traits<int16_t>
+        template<> struct Traits<SMALLINT>
         {
             static constexpr unsigned oid = INT2OID;
             static bool verifyType(const void* result, int column)
@@ -71,10 +72,10 @@ namespace Fastcgipp
                 const auto size = PQfsize(
                         reinterpret_cast<const PGresult*>(result),
                         column);
-                return type == oid && size == sizeof(int16_t);
+                return type == oid && size == 2;
             }
         };
-        template<> struct Traits<int32_t>
+        template<> struct Traits<INTEGER>
         {
             static constexpr unsigned oid = INT4OID;
             static bool verifyType(const void* result, int column)
@@ -85,10 +86,10 @@ namespace Fastcgipp
                 const auto size = PQfsize(
                         reinterpret_cast<const PGresult*>(result),
                         column);
-                return type == oid && size == sizeof(int32_t);
+                return type == oid && size == 4;
             }
         };
-        template<> struct Traits<int64_t>
+        template<> struct Traits<BIGINT>
         {
             static constexpr unsigned oid = INT8OID;
             static bool verifyType(const void* result, int column)
@@ -99,10 +100,10 @@ namespace Fastcgipp
                 const auto size = PQfsize(
                         reinterpret_cast<const PGresult*>(result),
                         column);
-                return type == oid && size == sizeof(int64_t);
+                return type == oid && size == 8;
             }
         };
-        template<> struct Traits<float>
+        template<> struct Traits<REAL>
         {
             static constexpr unsigned oid = FLOAT4OID;
             static bool verifyType(const void* result, int column)
@@ -113,10 +114,10 @@ namespace Fastcgipp
                 const auto size = PQfsize(
                         reinterpret_cast<const PGresult*>(result),
                         column);
-                return type == oid && size == sizeof(float);
+                return type == oid && size == 4;
             }
         };
-        template<> struct Traits<double>
+        template<> struct Traits<DOUBLE_PRECISION>
         {
             static constexpr unsigned oid = FLOAT8OID;
             static bool verifyType(const void* result, int column)
@@ -127,10 +128,10 @@ namespace Fastcgipp
                 const auto size = PQfsize(
                         reinterpret_cast<const PGresult*>(result),
                         column);
-                return type == oid && size == sizeof(double);
+                return type == oid && size == 8;
             }
         };
-        template<> struct Traits<std::string>
+        template<> struct Traits<TEXT>
         {
             static constexpr unsigned oid = TEXTOID;
             static bool verifyType(const void* result, int column)
@@ -141,7 +142,7 @@ namespace Fastcgipp
                 return type == oid;
             }
         };
-        template<> struct Traits<std::wstring>
+        template<> struct Traits<WTEXT>
         {
             static constexpr unsigned oid = TEXTOID;
             static bool verifyType(const void* result, int column)
@@ -152,7 +153,7 @@ namespace Fastcgipp
                 return type == oid;
             }
         };
-        template<> struct Traits<std::chrono::time_point<std::chrono::system_clock>>
+        template<> struct Traits<TIMESTAMPTZ>
         {
             static constexpr unsigned oid = TIMESTAMPTZOID;
             static bool verifyType(const void* result, int column)
@@ -166,7 +167,21 @@ namespace Fastcgipp
                 return type == oid && size == 8;
             }
         };
-        template<> struct Traits<Fastcgipp::Address>
+        template<> struct Traits<DATE>
+        {
+            static constexpr unsigned oid = DATEOID;
+            static bool verifyType(const void* result, int column)
+            {
+                const Oid type = PQftype(
+                        reinterpret_cast<const PGresult*>(result),
+                        column);
+                const auto size = PQfsize(
+                        reinterpret_cast<const PGresult*>(result),
+                        column);
+                return type == oid && size == 4;
+            }
+        };
+        template<> struct Traits<INET>
         {
             static constexpr unsigned oid = INETOID;
             static constexpr char addressFamily = PGSQL_AF_INET6;
@@ -178,7 +193,7 @@ namespace Fastcgipp
                 return type == oid;
             }
         };
-        template<> struct Traits<std::vector<char>>
+        template<> struct Traits<BYTEA>
         {
             static constexpr unsigned oid = BYTEAOID;
             static bool verifyType(const void* result, int column)
@@ -189,7 +204,7 @@ namespace Fastcgipp
                 return type == oid;
             }
         };
-        template<> struct Traits<std::vector<int16_t>>
+        template<> struct Traits<ARRAY<SMALLINT>>
         {
             static constexpr unsigned oid = INT2ARRAYOID;
             static bool verifyType(const void* result, int column)
@@ -200,7 +215,7 @@ namespace Fastcgipp
                 return type == oid;
             }
         };
-        template<> struct Traits<std::vector<int32_t>>
+        template<> struct Traits<ARRAY<INTEGER>>
         {
             static constexpr unsigned oid = INT4ARRAYOID;
             static bool verifyType(const void* result, int column)
@@ -211,7 +226,7 @@ namespace Fastcgipp
                 return type == oid;
             }
         };
-        template<> struct Traits<std::vector<int64_t>>
+        template<> struct Traits<ARRAY<BIGINT>>
         {
             static constexpr unsigned oid = INT8ARRAYOID;
             static bool verifyType(const void* result, int column)
@@ -222,7 +237,7 @@ namespace Fastcgipp
                 return type == oid;
             }
         };
-        template<> struct Traits<std::vector<float>>
+        template<> struct Traits<ARRAY<REAL>>
         {
             static constexpr unsigned oid = FLOAT4ARRAYOID;
             static bool verifyType(const void* result, int column)
@@ -233,7 +248,7 @@ namespace Fastcgipp
                 return type == oid;
             }
         };
-        template<> struct Traits<std::vector<double>>
+        template<> struct Traits<ARRAY<DOUBLE_PRECISION>>
         {
             static constexpr unsigned oid = FLOAT8ARRAYOID;
             static bool verifyType(const void* result, int column)
@@ -244,7 +259,7 @@ namespace Fastcgipp
                 return type == oid;
             }
         };
-        template<> struct Traits<std::vector<std::string>>
+        template<> struct Traits<ARRAY<TEXT>>
         {
             static constexpr unsigned oid = TEXTARRAYOID;
             static bool verifyType(const void* result, int column)
@@ -255,7 +270,7 @@ namespace Fastcgipp
                 return type == oid;
             }
         };
-        template<> struct Traits<std::vector<std::wstring>>
+        template<> struct Traits<ARRAY<WTEXT>>
         {
             static constexpr unsigned oid = TEXTARRAYOID;
             static bool verifyType(const void* result, int column)
